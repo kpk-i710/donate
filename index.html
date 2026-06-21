@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Поддержать проект</title>
     
-    <!-- Твой рабочий скрипт SDK -->
     <script src="https://www.paypal.com/sdk/js?client-id=BAAqUJ02axfzH2QPJzOycyz1rIxLseQ8m9bQvC_-NTpB5UfgCXwHiZOZalu5JXeXSU6ORIgzpXh4SnFKI0&components=hosted-buttons&disable-funding=venmo&currency=USD"></script>
 
     <style>
@@ -19,15 +18,83 @@
             margin: 0;
         }
         
-        .donation-card {
+        /* Главная кнопка на сайте */
+        .open-popup-btn {
+            background-color: #0070ba;
+            color: white;
+            border: none;
+            padding: 16px 36px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 100px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 112, 186, 0.3);
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        .open-popup-btn:hover {
+            background-color: #005ea6;
+        }
+
+        .open-popup-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Задний фон попапа (затемнение) */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 999;
+        }
+
+        /* Когда попап активен */
+        .popup-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Само всплывающее окно */
+        .popup-content {
             background: #ffffff;
             padding: 40px 30px;
             border-radius: 24px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
             text-align: center;
-            max-width: 440px; /* Сделали карточку еще шире */
+            max-width: 400px;
             width: 90%;
-            box-sizing: border-box;
+            position: relative;
+            transform: translateY(-20px);
+            transition: transform 0.3s ease;
+        }
+
+        .popup-overlay.active .popup-content {
+            transform: translateY(0);
+        }
+
+        /* Кнопка закрытия (крестик) */
+        .close-popup-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 24px;
+            background: none;
+            border: none;
+            color: #aaa;
+            cursor: pointer;
+        }
+
+        .close-popup-btn:hover {
+            color: #333;
         }
         
         .icon {
@@ -38,26 +105,23 @@
         h2 {
             color: #2c3e50;
             margin: 0 0 12px 0;
-            font-size: 26px;
+            font-size: 24px;
             font-weight: 600;
         }
         
         p {
             color: #7f8c8d;
-            font-size: 15px;
-            line-height: 1.6;
-            margin: 0 0 30px 0;
+            font-size: 14px;
+            line-height: 1.5;
+            margin: 0 0 25px 0;
         }
         
-        /* Жёстко задаем ширину контейнеру PayPal, чтобы скрипт не сходил с ума */
+        /* Контейнер PayPal внутри попапа */
         .paypal-container {
             width: 320px; 
             margin: 0 auto !important;
-            display: block !important;
-            clear: both;
         }
 
-        /* Насильно запрещаем ломать строки внутренним блокам PayPal */
         #paypal-container-WV6GY4K8KVKHA, 
         #paypal-container-WV6GY4K8KVKHA * {
             width: 100% !important;
@@ -68,22 +132,49 @@
 </head>
 <body>
 
-    <div class="donation-card">
-        <div class="icon">❤️</div>
-        <h2>Пожертвовать</h2>
-        <p>Ваша поддержка помогает нашему проекту развиваться и делать этот мир немного лучше.</p>
-                
-        <!-- Контейнер для кнопки -->
-        <div class="paypal-container">
-            <div id="paypal-container-WV6GY4K8KVKHA"></div>
+    <button class="open-popup-btn" id="openPopup">❤️ Поддержать проект</button>
+
+    <div class="popup-overlay" id="popupOverlay">
+        <div class="popup-content">
+            <button class="close-popup-btn" id="closePopup">&times;</button>
+            
+            <div class="icon">❤️</div>
+            <h2>Пожертвовать</h2>
+            <p>Ваша поддержка помогает нашему проекту развиваться!</p>
+                    
+            <div class="paypal-container">
+                <div id="paypal-container-WV6GY4K8KVKHA"></div>
+            </div>
         </div>
     </div>
 
-    <!-- Твой скрипт инициализации кнопки -->
     <script>
       paypal.HostedButtons({
         hostedButtonId: "WV6GY4K8KVKHA",
       }).render("#paypal-container-WV6GY4K8KVKHA");
+    </script>
+
+    <script>
+        const openBtn = document.getElementById('openPopup');
+        const closeBtn = document.getElementById('closePopup');
+        const overlay = document.getElementById('popupOverlay');
+
+        // Открыть попап
+        openBtn.addEventListener('click', () => {
+            overlay.classList.add('active');
+        });
+
+        // Закрыть попап при клике на крестик
+        closeBtn.addEventListener('click', () => {
+            overlay.classList.remove('active');
+        });
+
+        // Закрыть попап при клике на темную область вокруг окна
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) {
+                overlay.classList.remove('active');
+            }
+        });
     </script>
 
 </body>
