@@ -25,7 +25,7 @@
             border-radius: 24px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
             text-align: center;
-            max-width: 420px; /* Сделали карточку чуть шире */
+            max-width: 440px; /* Сделали карточку еще шире */
             width: 90%;
             box-sizing: border-box;
         }
@@ -49,16 +49,20 @@
             margin: 0 0 30px 0;
         }
         
-        /* Исправленный контейнер: убрали flex, разрешили кнопке занимать 100% ширины */
+        /* Жёстко задаем ширину контейнеру PayPal, чтобы скрипт не сходил с ума */
         .paypal-container {
-            width: 100%;
-            margin: 0 auto;
-            text-align: center;
+            width: 320px; 
+            margin: 0 auto !important;
+            display: block !important;
+            clear: both;
         }
 
-        /* Заставляем внутренние элементы PayPal не сжиматься в столбик */
-        .paypal-container * {
-            max-width: 100% !important;
+        /* Насильно запрещаем ломать строки внутренним блокам PayPal */
+        #paypal-container-WV6GY4K8KVKHA, 
+        #paypal-container-WV6GY4K8KVKHA * {
+            width: 100% !important;
+            min-width: 300px !important;
+            box-sizing: border-box !important;
         }
     </style>
 </head>
